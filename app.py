@@ -54,15 +54,17 @@ if user_input:
     st.subheader("클래스별 예측 점수")
 
     # 가장 높은 점수와 해당 클래스 가져오기
-    top_class_id = result_df.iloc[0]['Class ID']
-    top_class_name = result_df.iloc[0]['Class Name']
-    top_score = result_df.iloc[0]['Score']
+    top_class_row = result_df.sort_values(by='Score', ascending=False).iloc[0]  # 점수 기준 내림차순 정렬 후 첫 번째 행 선택
+    top_class_id = top_class_row['Class ID']
+    top_class_name = top_class_row['Class Name']
+    top_score = top_class_row['Score']
+
     st.write(f"클래스: {top_class_name}, 점수: {top_score:.4f}")
 
     # Altair 차트 생성
     chart = alt.Chart(result_df).mark_bar().encode(
         x=alt.X('Class Name', sort=None, title='Class Name (ID)'),
-        y=alt.Y('Score', title='Score'),
+        y=alt.Y('Score', title='Score', scale=alt.Scale(domain=[0, max(result_df['Score']) * 1.2])),  # y축 스케일 조정
         tooltip=['Class Name', 'Score']
     ).properties(
         width=700,
